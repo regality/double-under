@@ -1,17 +1,14 @@
 {
-  "author": "Adam Blackburn",
+  "author": "Adam Blackburn <adam@ifit.com>",
   "name": "double-under",
   "description": "Shared Object",
-  "version": "0.0.0",
-  "repository": {
-    "url": ""
-  },
+  "version": "0.0.1",
+  "repository": "git://github.com/regality/double-under.git",
+  "homepage": "https://github.com/regality/double-under",
   "main": "index.js",
   "dependencies": {
     "redis": "~0.7.1"
   },
-  "devDependencies": {},
-  "optionalDependencies": {},
   "engines": {
     "node": "*"
   },
