@@ -1,0 +1,18 @@
+{
+  "author": "Adam Blackburn",
+  "name": "double-under",
+  "description": "Shared Object",
+  "version": "0.0.0",
+  "repository": {
+    "url": ""
+  },
+  "main": "index.js",
+  "dependencies": {
+    "redis": "~0.7.1"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
