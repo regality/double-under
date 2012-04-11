@@ -34,3 +34,10 @@ foo.set('double', 'under');
 foo.double = 'underscore'; // this works now.
 ```
 
+## TODO
+
+* Add mutexes/semaphores or something to prevent race conditions.
+
+* Add atomic pop/push for arrays.
+
+* Add a test suite.

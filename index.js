@@ -68,6 +68,8 @@ DoubleUnder.prototype.set = function set(key, value) {
       self.object[key] = v;
       pub.publish("__:" + self.name, key + ":" + JSON.stringify(v));
     });
+
+    self[key] = v; // trigger setter
   }
 
 };
