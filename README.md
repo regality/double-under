@@ -41,3 +41,5 @@ foo.double = 'underscore'; // this works now.
 * Add atomic pop/push for arrays.
 
 * Add a test suite.
+
+* Use [msgpack](https://github.com/pgriess/node-msgpack) instead of JSON parse/stringify
