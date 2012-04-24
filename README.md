@@ -7,7 +7,6 @@ pub/sub channel.
 It is simple and fun to use.
 
 ```javascript
-
 var __ = require('double-under');
 
 // configure redis host before using
@@ -15,23 +14,16 @@ __.configure({
   host: 'localhost'
 });
 
-
 // variables are shared based on namespace
-var foo = __({
-  __: 'foo', // namespace (required)
-  foo: 'bar',
-  baz: 'bam'
-});
+var foo = __('foo');
 
-foo.baz = 'bambam!';
+foo.set('double', 'decker');
 // baz is now propogated to every
 // process on every machine
 
-// if you set a new property,
-// use the set method the first time
-foo.set('double', 'under');
+// you only have to use set the first time
+foo.double = 'under'; // this works
 
-foo.double = 'underscore'; // this works now.
 ```
 
 ## TODO
@@ -40,6 +32,6 @@ foo.double = 'underscore'; // this works now.
 
 * Add atomic pop/push for arrays.
 
-* Add a test suite.
+* Allow atomic update of fields in sub objects.
 
-* Use [msgpack](https://github.com/pgriess/node-msgpack) instead of JSON parse/stringify
+* Add a test suite.
