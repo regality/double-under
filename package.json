@@ -15,9 +15,5 @@
   },
   "engines": {
     "node": "*"
-  },
-  "files": [
-    "index.js",
-    "README.md"
-  ]
+  }
 }
