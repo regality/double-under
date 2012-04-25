@@ -151,11 +151,9 @@ function onMessage(channel, msg) {
   } else if (action === "fullupdate") {
     values[key] = value;
     for (var k in values[key]) {
-      if (values[key].hasOwnProperty(k)) {
-        applyToNameSpace(function(v) {
-          v.addSetter(k);
-        });
-      }
+      applyToNameSpace(function(v) {
+        v.addSetter(k);
+      });
     }
   }
 }
