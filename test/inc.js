@@ -1,8 +1,6 @@
 var __ = require('../index');
 
-__.configure({
-  host: 'localhost'
-});
+__.configure();
 
 var x = __("__test");
 x.set('inc', 7);

@@ -3,19 +3,20 @@ var spawn = require('child_process').spawn
   , __ = require('../index')
   ;
 
-__.configure({
-  host: 'localhost'
-});
+__.configure();
 
 var x = __("__test");
 
 function runFile(file, cb) {
-  var child = spawn('node', ['./' + file]);
+  var child = spawn('node', [__dirname + '/' + file]);
+  child.stderr.on('data', function(data) {
+    console.log(data.toString());
+  });
   child.stdout.on('data', function(data) {
     console.log(data.toString());
   });
-  child.on('exit', function() {
-    //console.log(file + " exited");
+  child.on('exit', function(status) {
+    assert.equal(status, 0);
     cb();
   });
 }

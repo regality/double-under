@@ -33,7 +33,7 @@ function getFullUpdate(name) {
     if (!vals) return;
     for (var key in vals) {
       if (vals.hasOwnProperty(key)) {
-        set(name, key, vals[key], false);
+        set(name, key, JSON.parse(vals[key]), false);
       }
     }
   });
