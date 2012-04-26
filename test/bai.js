@@ -4,9 +4,7 @@ __.configure({
   host: 'localhost'
 });
 
-var x = __({
-  __: "__test"
-});
+var x = __("__test");
 
 x.unset('hai');
 

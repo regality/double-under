@@ -10,7 +10,6 @@ var redis = require('redis')
   , timers = {}
   , pub
   , sub
-  , pop
   ;
 
 function configure(_config) {
@@ -19,56 +18,31 @@ function configure(_config) {
   config.host = config.host || 'localhost';
   pub = redis.createClient(config.port, config.host, config);
   sub = redis.createClient(config.port, config.host, config);
-  pop = redis.createClient(config.port, config.host, config);
   sub.on('message', onMessage);
-  sub.subscribe('__:fullupdate:' + pubkey);
 }
 
-function init(name) {
+function initRegistry(name) {
   registry[name] = [];
-  values[name] = values[name] || {};
   sub.subscribe("__:" + name);
-  requestFullUpdate(name);
-  popFullUpdateRequest(name);
+  values[name] = {};
+  getFullUpdate(name);
 }
 
-function popFullUpdateRequest(name) {
-  pop.blpop('fullupdate:' + name, 3600, function(err, vals) {
-    if (!vals) return popFullUpdateRequest(name);
-    // graciously send out a full update
-    var name = vals[0].split(':')[1];
-    var pubChannel = vals[1];
-    graciouslyProvideUpdate(name, pubChannel);
+function getFullUpdate(name) {
+  pub.hgetall('__:' + name, function(err, vals) {
+    if (!vals) return;
+    for (var key in vals) {
+      if (vals.hasOwnProperty(key)) {
+        set(name, key, vals[key], false);
+      }
+    }
   });
-}
-
-function graciouslyProvideUpdate(name, channel) {
-  if (values[name]) {
-    // be a peach
-    publish(channel, 'fullupdate', name, values[name]);
-    popFullUpdateRequest(name);
-  } else {
-    // dammit
-    // make someone else do it
-    // TODO: add a TTL or something
-    pub.rpush('fullupdate:' + name, channel);
-  }
-}
-
-function requestFullUpdate(name) {
-  if (sub.ready) {
-    pub.rpush('fullupdate:' + name, 'fullupdate:' + pubkey);
-  } else {
-    pub.on('ready', function() {
-      pub.rpush('fullupdate:' + name, 'fullupdate:' + pubkey);
-    });
-  }
 }
 
 function register(self) {
   var name = self.name;
   if (!registry.hasOwnProperty(name)) {
-    init(name);
+    initRegistry(name);
   }
   registry[name].push(self);
 }
@@ -87,12 +61,8 @@ function unRegister(self) {
   }
 }
 
-function getNamespace(name) {
-  return registry[name];
-}
-
 function applyToNameSpace(name, fn) {
-  var objects = getNamespace(name);
+  var objects = registry[name];
   if (!objects) return;
   objects.forEach(fn);
 }
@@ -101,9 +71,15 @@ function publish(name, action, key, value) {
   var channel = '__:' + name;
   var msg = pubkey + ':' + action + ':' + key;
   if (value) {
-    msg += ':' + JSON.stringify(value);
+    value = JSON.stringify(value);
+    msg += ':' + value;
   }
   pub.publish(channel, msg);
+  if (action === 'set') {
+    pub.hset(channel, key, value);
+  } else if (action === 'unset') {
+    pub.hdel(channel, key);
+  }
 }
 
 function unset(name, key, doPublish) {
@@ -141,20 +117,13 @@ function onMessage(channel, msg) {
   var id = m[1];
   var action = m[2];
   var key = m[3];
-  var value = (m[4].length === 0 ? null : JSON.parse(m[4]));
+  var value = (m[4] === undefined || m[4].length === 0 ? null : JSON.parse(m[4]));
 
   if (id === pubkey) return; // ignore messages we send out
   if (action === "unset") {
     unset(name, key, false);
   } else if (action === "set") {
     set(name, key, value, false);
-  } else if (action === "fullupdate") {
-    values[key] = value;
-    for (var k in values[key]) {
-      applyToNameSpace(function(v) {
-        v.addSetter(k);
-      });
-    }
   }
 }
 

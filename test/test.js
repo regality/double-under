@@ -7,26 +7,34 @@ __.configure({
   host: 'localhost'
 });
 
-var x = __({
-  __: "__test"
-});
+var x = __("__test");
 
 function runFile(file, cb) {
   var child = spawn('node', ['./' + file]);
+  child.stdout.on('data', function(data) {
+    console.log(data.toString());
+  });
   child.on('exit', function() {
-    console.log(file + " exited");
+    //console.log(file + " exited");
     cb();
   });
 }
 
 runFile('inc', function() {
-  console.log(x.toString());
+  assert.equal(x.inc, 7);
+
   runFile('arr', function() {
-    console.log(x.toString());
+    assert.deepEqual(x.valueOf().arr, [7, 8, 9]);
+
     runFile('hai', function() {
-      console.log(x.toString());
+      assert.equal(x.hai, 'bai');
+
       runFile('bai', function() {
-        console.log(x.toString());
+        assert.equal(x.hai, undefined);
+
+
+        console.log("All assertions passed.");
+        process.exit();
       });
     });
   });
