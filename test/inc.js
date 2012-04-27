@@ -3,8 +3,8 @@ var __ = require('../index');
 __.configure();
 
 var x = __("__test");
-x.set('inc', 7);
 
-setTimeout(function() {
+x.on('ready', function() {
+  x.set('inc', 7);
   process.exit();
-}, 100);
+});

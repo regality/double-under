@@ -1,8 +1,12 @@
 "use strict";
 
-var redis = require('redis')
-  , _ = require('underscore')
+var events = require('events')
+  , util   = require('util')
+  , redis  = require('redis')
+  , _      = require('underscore')
   , randId = require('./lib/rand')
+
+var EventEmitter = events.EventEmitter
   , pubkey = randId(20)
   , config = null
   , registry = {}
@@ -21,14 +25,14 @@ function configure(_config) {
   sub.on('message', onMessage);
 }
 
-function initRegistry(name) {
+function initRegistry(name, cb) {
   registry[name] = [];
   sub.subscribe("__:" + name);
   values[name] = {};
-  getFullUpdate(name);
+  getFullUpdate(name, cb);
 }
 
-function getFullUpdate(name) {
+function getFullUpdate(name, cb) {
   pub.hgetall('__:' + name, function(err, vals) {
     if (!vals) return;
     for (var key in vals) {
@@ -36,15 +40,19 @@ function getFullUpdate(name) {
         set(name, key, JSON.parse(vals[key]), false);
       }
     }
+    cb();
   });
 }
 
-function register(self) {
+function register(self, cb) {
   var name = self.name;
   if (!registry.hasOwnProperty(name)) {
-    initRegistry(name);
+    initRegistry(name, cb);
+    registry[name].push(self);
+  } else {
+    registry[name].push(self);
+    cb();
   }
-  registry[name].push(self);
 }
 
 function unRegister(self) {
@@ -68,6 +76,9 @@ function applyToNameSpace(name, fn) {
 }
 
 function publish(name, action, key, value) {
+  applyToNameSpace(name, function(v) {
+    v.emit("publish");
+  });
   var channel = '__:' + name;
   var msg = pubkey + ':' + action + ':' + key;
   if (value) {
@@ -129,13 +140,21 @@ function onMessage(channel, msg) {
 
 function DoubleUnder(name) {
   if (!config) throw new Error('You must call __.configure before using double-under');
+  var self = this;
   this.name = name;
-  register(this);
+  this.ready = false;
+  this.on('newListener', function(event) {
+    if (event === 'ready' && this.ready) {
+      self.emit("ready");
+    }
+  });
+  register(this, function() {
+    self.ready = true;
+    self.emit("ready");
+  });
 }
 
-DoubleUnder.prototype.set = function __set(key, value) {
-  set(this.name, key, value, true);
-};
+util.inherits(DoubleUnder, EventEmitter);
 
 DoubleUnder.prototype.addSetter = function addSetter(key) {
   var name = this.name;
@@ -154,6 +173,14 @@ DoubleUnder.prototype.addSetter = function addSetter(key) {
 
 DoubleUnder.prototype.deleteSetter = function deleteSetter(key) {
   delete this[key];
+};
+
+DoubleUnder.prototype.set = function __set(key, value) {
+  set(this.name, key, value, true);
+};
+
+DoubleUnder.prototype.get = function __get(key) {
+  return values[this.name][key]
 };
 
 DoubleUnder.prototype.update = function update(key) {

@@ -4,8 +4,7 @@ __.configure();
 
 var x = __("__test");
 
-x.unset('hai');
-
-setTimeout(function() {
+x.on("ready", function() {
+  x.unset('hai');
   process.exit();
-}, 100);
+});

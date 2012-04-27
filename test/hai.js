@@ -4,8 +4,7 @@ __.configure();
 
 var x = __('__test');
 
-x.set('hai', 'bai');
-
-setTimeout(function() {
+x.on('ready', function() {
+  x.set('hai', 'bai');
   process.exit();
-}, 100);
+});
