@@ -143,9 +143,9 @@ function DoubleUnder(name) {
   var self = this;
   this.name = name;
   this.ready = false;
-  this.on('newListener', function(event) {
-    if (event === 'ready' && this.ready) {
-      self.emit("ready");
+  this.on('newListener', function(event, listener) {
+    if (event === 'ready' && self.ready) {
+      listener();
     }
   });
   register(this, function() {
