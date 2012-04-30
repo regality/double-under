@@ -34,7 +34,7 @@ function initRegistry(name, cb) {
 
 function getFullUpdate(name, cb) {
   pub.hgetall('__:' + name, function(err, vals) {
-    if (!vals) return;
+    if (!vals) return cb();
     for (var key in vals) {
       if (vals.hasOwnProperty(key)) {
         set(name, key, JSON.parse(vals[key]), false);
@@ -181,6 +181,10 @@ DoubleUnder.prototype.set = function __set(key, value) {
 
 DoubleUnder.prototype.get = function __get(key) {
   return values[this.name][key]
+};
+
+DoubleUnder.prototype.has = function __has(key) {
+  return values[this.name].hasOwnProperty(key);
 };
 
 DoubleUnder.prototype.update = function update(key) {
