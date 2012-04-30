@@ -2,7 +2,7 @@
   "author": "Adam Blackburn <adam@ifit.com>",
   "name": "double-under",
   "description": "Shared Object",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "repository": "git://github.com/regality/double-under.git",
   "homepage": "https://github.com/regality/double-under",
   "main": "index.js",
