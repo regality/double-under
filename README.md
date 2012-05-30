@@ -34,4 +34,6 @@ foo.double = 'under'; // this works
 
 * Allow atomic update of fields in sub objects.
 
+* Add expire option
+
 * Add a test suite.
