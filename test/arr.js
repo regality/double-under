@@ -4,7 +4,7 @@ __.configure();
 
 var x = __("__test");
 
-x.on('ready', function() {
+x.ready(function() {
   x.set('arr', []);
   var inc = Number(x.inc);
   x.arr.push(inc);

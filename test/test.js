@@ -21,7 +21,7 @@ function runFile(file, cb) {
   });
 }
 
-x.on('ready', function() {
+x.ready(function() {
   runFile('inc', function() {
     assert.equal(x.inc, 7);
 
