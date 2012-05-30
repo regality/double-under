@@ -5,6 +5,8 @@ var events = require('events')
   , redis  = require('redis')
   , _      = require('underscore')
   , randId = require('./lib/rand')
+  , ready  = require('ready')
+  ;
 
 var EventEmitter = events.EventEmitter
   , pubkey = randId(20)
@@ -140,21 +142,18 @@ function onMessage(channel, msg) {
 
 function DoubleUnder(name) {
   if (!config) throw new Error('You must call __.configure before using double-under');
+  
+  // inherits EventEmitter
+  EventEmitter.call(this);
+
   var self = this;
   this.name = name;
-  this.ready = false;
-  this.on('newListener', function(event, listener) {
-    if (event === 'ready' && self.ready) {
-      listener();
-    }
-  });
   register(this, function() {
-    self.ready = true;
-    self.emit("ready");
+    self.ready(true);
   });
 }
-
 util.inherits(DoubleUnder, EventEmitter);
+ready.mixin(DoubleUnder.prototype);
 
 DoubleUnder.prototype.addSetter = function addSetter(key) {
   var name = this.name;
