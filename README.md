@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/regality/double-under.png)](http://travis-ci.org/regality/double-under)
 # Double Under
 
 Double Under is a node.js utility that allows for shared objects between
