@@ -19,12 +19,11 @@ __.configure({
 var foo = __('foo');
 
 foo.set('double', 'decker');
-// baz is now propogated to every
+// double is now propogated to every
 // process on every machine
 
 // you only have to use set the first time
 foo.double = 'under'; // this works
-
 ```
 
 ## TODO
@@ -36,5 +35,3 @@ foo.double = 'under'; // this works
 * Allow atomic update of fields in sub objects.
 
 * Add expire option
-
-* Add a test suite.
